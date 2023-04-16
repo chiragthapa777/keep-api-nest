@@ -15,12 +15,16 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-      const newUser = new this.userModel(createUserDto);
-      await newUser.save()
-      const savedUser = await newUser.toObject();
-      delete savedUser.password;
-      savedUser["token"] = await this.jwt.getJwtToken(savedUser)
-      return savedUser;
+    const foundUser = await this.userModel.findOne({
+      email:createUserDto.email
+    }).exec();
+    if(foundUser) throw new BadRequestException("Email already used.")
+    const newUser = new this.userModel(createUserDto);
+    await newUser.save()
+    const savedUser = await newUser.toObject();
+    delete savedUser.password;
+    savedUser["token"] = await this.jwt.getJwtToken(savedUser)
+    return savedUser;
   }
 
   async login(loginUserDto: LoginUserDto): Promise<User>{

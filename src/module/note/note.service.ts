@@ -19,24 +19,27 @@ export class NoteService {
     try {
       const {tags} = createNoteDto
       const tagsArr: Tag[] = []
-      for(const name of tags){
-        const foundTag = await this.tagModel.findOne({
-          userId:user._id,
-          name
-        }).session(t)
-        if(foundTag){
-          tagsArr.push(foundTag)
-        }else{
-          const newTag = new this.tagModel({
-            name,
-            userId:user._id
-          })
-          await newTag.save({
-            session:t
-          })
-          tagsArr.push(newTag)
+      if(tags){
+        for(const name of tags){
+          const foundTag = await this.tagModel.findOne({
+            userId:user._id,
+            name
+          }).session(t)
+          if(foundTag){
+            tagsArr.push(foundTag)
+          }else{
+            const newTag = new this.tagModel({
+              name,
+              userId:user._id
+            })
+            await newTag.save({
+              session:t
+            })
+            tagsArr.push(newTag)
+          }
         }
       }
+
       delete createNoteDto.tags
       const newNote = new this.noteModel({
         ...createNoteDto,
