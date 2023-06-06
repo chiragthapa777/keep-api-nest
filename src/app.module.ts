@@ -9,6 +9,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from "./module/auth/auth.guard";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtService } from "./module/user/jwt/jwt.service";
+import { ChatModule } from './module/chat/chat/chat.module';
+import { ChatWsModule } from './module/chat/chat_ws/chat_ws.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { JwtService } from "./module/user/jwt/jwt.service";
     }),
     UserModule,
     NoteModule,
+    ChatModule,
+    ChatWsModule,
   ],
   controllers: [AppController],
   providers: [AppService,{
