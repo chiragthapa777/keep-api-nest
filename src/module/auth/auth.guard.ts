@@ -21,7 +21,16 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.token;
+    // console.log(
+    //   '🚀 ~ file: auth.guard.ts:24 ~ AuthGuard ~ canActivate ~ request:',
+    //   request.headers,
+    // );
+    const bearer = request.headers.authorization || '';
+    // console.log(
+    //   '🚀 ~ file: auth.guard.ts:25 ~ AuthGuard ~ canActivate ~ bearer:',
+    //   bearer,
+    // );
+    const token = bearer.split(' ')[1];
     if (!token) {
       throw new UnauthorizedException('Login first');
     }

@@ -11,12 +11,14 @@ import mongoose, { Model } from 'mongoose';
 import { Note } from './entities/note.entity';
 import { Tag } from './entities/tag.entity';
 import { RequestUserInterface } from '../../types/requestUser';
+import { ChatWsGateway } from '../chat/chat_ws/chat_ws.gateway';
 @Injectable({ scope: Scope.REQUEST })
 export class NoteService {
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
     @InjectModel(Tag.name) private tagModel: Model<Tag>,
     @InjectConnection() private readonly connection: mongoose.Connection,
+    private socketGateway: ChatWsGateway,
   ) {}
 
   async create(createNoteDto: CreateNoteDto, user: RequestUserInterface) {
@@ -58,6 +60,7 @@ export class NoteService {
         session: t,
       });
       await t.commitTransaction();
+      this.socketGateway.sendNotification(user._id, 'new note is created');
       return newNote;
     } catch (e) {
       await t.abortTransaction();
@@ -65,14 +68,11 @@ export class NoteService {
     } finally {
       t.endSession();
     }
-    const { tags } = createNoteDto;
   }
 
-  async findAll(user: RequestUserInterface) {
+  async findAll(findObj: any) {
     return await this.noteModel
-      .find({
-        userId: user._id,
-      })
+      .find(findObj)
       .populate({
         path: 'tags',
         match: {},

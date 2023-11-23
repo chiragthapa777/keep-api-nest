@@ -6,6 +6,6 @@ import { ChatWsModule } from "../chat_ws/chat_ws.module";
 @Module({
   controllers: [ChatController],
   providers: [ChatService],
-  imports:[ ChatWsModule]
+  imports: [ChatWsModule],
 })
 export class ChatModule {}
